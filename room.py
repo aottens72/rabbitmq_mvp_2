@@ -48,8 +48,7 @@ class ChatMessage():
         self.__mess_id = mess_id
 
     def to_dict(self):
-        mess_props_dict = self.mess_props.to_dict()
-        return {'message': self.message, 'mess_props': mess_props_dict}
+        return {'message': self.message, 'mess_props': self.mess_props.to_dict()}
 
     def __str__(self):
         return f'Chat Message: {self.message} - message props: {self.mess_props}'
@@ -63,15 +62,37 @@ class ChatRoom(deque):
     def __init__(self, room_name: str, member_list: list = None, owner_alias: str = "", room_type: int = ROOM_TYPE_PRIVATE, create_new: bool = False) -> None:
         super(ChatRoom, self).__init__()
         self.__room_name = room_name
-        self.__user_list = UserList()
+        self.__room_type = room_type
+        self.__owner_alias = owner_alias
+        if member_list is None:
+            self.__user_list = UserList()
+        else:
+            self.__user_list = member_list
+        self.__create_time = datetime.now()
+        self.__last_modified_time = self.__create_time
+
+        room_meta_data = {
+            'room_name': self.__room_name,
+            'room_type': self.__room_type,
+            'owner_alias': self.__owner_alias,
+            'memeber_list': self.__user_list,
+            'create_time': self.__create_time,
+            'modify_time': self.__modify_time
+        }
+
         # Set up mongo - client, db, collection, sequence_collection
         self.__mongo_client = MongoClient(host='34.94.157.136', port=27017, username='class', password='CPSC313', authSource='detest', authMechanism='SCRAM-SHA-256')
         self.__mongo_db = self.__mongo_client.detest
-        self.__mongo_collection = self.__mongo_db.get_collection(self.name) 
+        self.__mongo_collection = self.__mongo_db.get_collection(room_name) 
         self.__mongo_seq_collection = self.__mongo_db.get_collection("sequence")
+        self.__mongo_room_metadata_collection = self.__mongo_db.get_collection(METADATA_COLLECTION) #Save all room metadata into seperate collection, makes querying for messages in room collections easier
         if self.__mongo_collection is None:
-            self.__mongo_collection = self.__mongo_db.create_collection(self.name)
+            self.__mongo_collection = self.__mongo_db.create_collection(room_name)
+        if self.__mongo_room_metadata_collection is None:
+            self.__mongo_room_metadata_collection = self.__mongo_db.create_collection(METADATA_COLLECTION)
         # Restore from mongo if possible, if not (or we're creating new) then setup properties
+        if create_new or self.restore() is False:
+            self.__mongo_room_metadata_collection.insert_one(room_meta_data)
 
     def __get_next_sequence_num(self):
         """ This is the method that you need for managing the sequence. Note that there is a separate collection for just this one document
@@ -86,20 +107,29 @@ class ChatRoom(deque):
 
     #Overriding the queue type put and get operations to add type hints for the ChatMessage type
     def put(self, message: ChatMessage = None) -> None:
-        pass
+        self.appendleft(message)
 
     # overriding parent and setting block to false so we don't wait for messages if there are none
     def get(self) -> ChatMessage:
-        pass
+        return self.pop()
 
     def find_message(self, message_text: str) -> ChatMessage:
         pass
 
     def restore(self) -> bool:
-        pass
-
+        if self.__mongo_collection.count_documents == 0:
+            return False
+        else:
+            for document in self.__mongo_collection.find():
+                self.put(document['message'])
+        
     def persist(self):
-        pass
+        dirty_message_list = []
+        for message in self:
+            if message.__dirty:
+                dirty_message_list.append(message.to_dict())
+                message.__dirty = False
+        self.__mongo_collection.insert_many(dirty_message_list)
 
     def get_messages(self, user_alias: str, num_messages:int=GET_ALL_MESSAGES, return_objects: bool = True):
         # return message texts, full message objects, and total # of messages
