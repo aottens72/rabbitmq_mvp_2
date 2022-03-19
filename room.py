@@ -48,7 +48,7 @@ class ChatMessage():
         self.__mess_id = mess_id
 
     def to_dict(self):
-        return {'message': self.message, 'mess_props': self.mess_props.to_dict()}
+        return {'message': self.__message, 'mess_props': self.__mess_props.to_dict()}
 
     def __str__(self):
         return f'Chat Message: {self.message} - message props: {self.mess_props}'
@@ -59,25 +59,27 @@ class ChatRoom(deque):
             this is assuming an existing instance. The opposite (owner_alias set and user_alias empty) means we're creating new
             members is always optional, and room_type is only relevant if we're creating new.
     """
-    def __init__(self, room_name: str, member_list: list = None, owner_alias: str = "", room_type: int = ROOM_TYPE_PRIVATE, create_new: bool = False) -> None:
+    def __init__(self, room_name: str, member_list: UserList = None, owner_alias: str = "", room_type: int = ROOM_TYPE_PRIVATE, create_new: bool = False) -> None:
         super(ChatRoom, self).__init__()
         self.__room_name = room_name
         self.__room_type = room_type
         self.__owner_alias = owner_alias
+        print(type(UserList()))
         if member_list is None:
             self.__user_list = UserList()
         else:
             self.__user_list = member_list
         self.__create_time = datetime.now()
         self.__last_modified_time = self.__create_time
-
+    
         room_meta_data = {
             'room_name': self.__room_name,
             'room_type': self.__room_type,
             'owner_alias': self.__owner_alias,
-            'memeber_list': self.__user_list,
+            #TODO: Figure out how the fuck to add member list
+            #'memeber_list': self.__user_list.get_all_users(),
             'create_time': self.__create_time,
-            'modify_time': self.__modify_time
+            'modify_time': self.__last_modified_time
         }
 
         # Set up mongo - client, db, collection, sequence_collection

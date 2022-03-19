@@ -40,6 +40,9 @@ class UserList():
             self.__modify_time = datetime.now()
             self.__dirty = True
     
+    def to_dict(self):
+        return {'list_name': self.__name, 'user_list': self.__user_list, 'create_time': self.__create_time, 'modify_time': self.__modify_time}
+
     def register(self, new_alias: str) -> ChatUser:
         """
         """
@@ -49,7 +52,7 @@ class UserList():
         pass
 
     def get_all_users(self) -> list:
-        pass
+        return self.__user_list
 
     def append(self, new_user: ChatUser) -> None:
         pass
