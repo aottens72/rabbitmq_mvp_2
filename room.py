@@ -138,7 +138,7 @@ class ChatRoom(deque):
         message_text_list = []
         message_object_list = []
         if num_messages != GET_ALL_MESSAGES:
-            for document in self.__mongo_collection.find(limit=num_messages).sort("sent_time"):
+            for document in self.__mongo_collection.find(limit=num_messages, ).sort("sent_time"):
                 message_text_list.append(document["message"])
                 message_object_list.append(document)
         for document in self.__mongo_collection.find().sort("sent_time"):
