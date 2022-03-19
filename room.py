@@ -135,7 +135,16 @@ class ChatRoom(deque):
 
     def get_messages(self, user_alias: str, num_messages:int=GET_ALL_MESSAGES, return_objects: bool = True):
         # return message texts, full message objects, and total # of messages
-        pass
+        message_text_list = []
+        message_object_list = []
+        if num_messages != GET_ALL_MESSAGES:
+            for document in self.__mongo_collection.find(limit=num_messages).sort("sent_time"):
+                message_text_list.append(document["message"])
+                message_object_list.append(document)
+        for document in self.__mongo_collection.find().sort("sent_time"):
+            message_text_list.append(document["message"])
+            message_object_list.append(document)
+        
 
     def send_message(self, message: str, from_alias: str, mess_props: MessageProperties) -> bool:
         pass
