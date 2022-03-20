@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import socket
 import logging
 import json
@@ -13,6 +14,10 @@ MY_IPADDRESS = ""
 # This is an extremely rare case where I have global variables. The first is the documented way to deal with running the app in uvicorn, the second is the 
 # instance of the rmq class that is necessary across all handlers that behave essentially as callbacks. 
 
+'''
+Launch the uvicorn server with: python -m uvicorn room_chat_api:app --reload
+Use postman to manually test the API at: 127.0.0.1:8000/
+'''
 
 app = FastAPI()
 room_list = RoomList()
@@ -22,9 +27,7 @@ logging.basicConfig(filename='chat.log', level=logging.INFO)
 
 @app.get("/")
 async def index():
-    """ Default page
-    """
-    pass
+    return None
 
 @app.get("/page/send", status_code=200)
 async def send_form(request: Request):
@@ -53,15 +56,23 @@ async def form_messages(request: Request, room_name: str = Form(...)):
 
 @app.get("/messages/", status_code=200)
 async def get_messages(request: Request, alias: str, room_name: str, messages_to_get: int = GET_ALL_MESSAGES):
-    """ API for getting messages
+    """ API for getting messages (from a specific room AND person?)
     """
-    pass
+    room_to_get = ChatRoom(room_name, owner_alias=alias, room_type=ROOM_TYPE_PUBLIC)
+    room_messages = room_to_get.get_messages(alias)
+
+    return room_messages[0]
 
 @app.get("/users/", status_code=200)
 async def get_users():
     """ API for getting users
     """
-    pass
+    users = getUserList()
+
+    if len(users.get_all_users()) > 0:
+        return users.get_all_users()
+    else:
+        return JSONResponse(status_code=405, content="No users have been registered")
 
 @app.post("/alias", status_code=201)
 async def register_client(client_alias: str, group_alias: bool = False):
@@ -79,12 +90,19 @@ async def create_room(room_name: str, owner_alias: str, room_type: int = ROOM_TY
 async def send_message(room_name: str, message: str, from_alias: str, to_alias: str):
     """ API for sending a message
     """
-    pass
+    room_to_send = ChatRoom(room_name, owner_alias=to_alias, room_type=ROOM_TYPE_PUBLIC, create_new=False)
+    message_props = MessageProperties(room_name, to_alias, from_alias, ROOM_TYPE_PUBLIC)
+    sent = room_to_send.send_message(message, from_alias, message_props)
+
+    return sent
 
 def main():
     logging.basicConfig(filename='chat.log', level=logging.INFO)
     MY_IPADDRESS = socket.gethostbyname(socket.gethostname())
     MY_NAME = input("Please enter your name: ")
 
-if __name__ == "__main__":
-    main()
+def getUserList():
+    try:
+        return UserList()
+    except:
+        return UserList('chat_users')

@@ -1,6 +1,4 @@
-from email import message
 import pika
-import json
 import pika.exceptions
 import logging
 from users import *
@@ -126,7 +124,7 @@ class ChatRoom(deque):
             self.__dirty = False
         else:
             self.__create_time = datetime.now()
-            self.__modify_time = datetime.now()
+            self.__last_modified_time = datetime.now()
             self.__dirty = True
         # Restore from mongo if possible, if not (or we're creating new) then setup properties
 
@@ -205,10 +203,10 @@ class ChatRoom(deque):
         logging.info(f'Inside retreive_messages, queue is {self.__rmq_queue_name}, exchange: {self.__rmq_exchange_name}, cache: {self}, channel: {self.__rmq_channel}')
         num_mess_received = 0
         for m_f, props, body in self.__rmq_channel.consume(self.__rmq_queue_name, auto_ack=True, inactivity_timeout=2):
-            num_mess_received += 1
             logging.info(f"inside retreive messages, processing a messsage. body = {body}")
             if body != None:
-                message_body_list.append(body)
+                num_mess_received += 1
+                message_body_list.append(body.decode('utf-8'))
                 new_mess_props = MessageProperties(
                     self.__room_name, # this is now received, the original will be sent
                     props.headers['_MessageProperties__to_user'],
@@ -218,12 +216,12 @@ class ChatRoom(deque):
                     props.headers['_MessageProperties__sent_time'],
                     props.headers['_MessageProperties__rec_time']
                 )
-                new_message = ChatMessage(body.decode('ascii'), new_mess_props)
+                new_message = ChatMessage(body.decode('utf-8'), new_mess_props)
                 message_obj_list.append(new_message)
                 logging.info(f'Inside retrieve, here is the new chatmessage: {new_message}')
                 logging.info(f'Inside retrieve, chatmessage body: {body}\n mess_props: {new_mess_props}\n')
                 self.put(new_message)
-                if num_mess_received >= num_messages:
+                if num_mess_received >= num_messages and num_messages is not GET_ALL_MESSAGES:
                     break
             else:
                 break
