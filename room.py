@@ -113,13 +113,15 @@ class ChatRoom(deque):
         self.__rmq_connection_params = pika.ConnectionParameters(RMQ_HOST, RMQ_PORT, credentials=self.__rmq_creds)
         self.__rmq_connection = pika.BlockingConnection(self.__rmq_connection_params)
         self.__rmq_channel = self.__rmq_connection.channel()
-        self.__rmq_exchange_name = room_name + "_exchange" if room_type is ROOM_TYPE_PUBLIC else ''
+        self.__rmq_exchange_name = room_name + '_exchange'
         self.__rmq_queue = self.__rmq_channel.queue_declare(queue=room_name)
         self.__rmq_queue_name = room_name
         if room_type is ROOM_TYPE_PUBLIC:
             self.__rmq_exchange = self.__rmq_channel.exchange_declare(exchange=self.__rmq_exchange_name, exchange_type='fanout') 
             self.__rmq_channel.queue_bind(exchange=self.__rmq_exchange_name, queue=room_name)
-
+        else:
+            self.__rmq_exchange = self.__rmq_channel.exchange_declare(exchange=self.__rmq_exchange_name)
+            self.__rmq_channel.queue_bind(exchange=self.__rmq_exchange_name, queue=room_name)
         if self.restore() is True:
             self.__dirty = False
         else:

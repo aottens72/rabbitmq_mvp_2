@@ -17,8 +17,8 @@ NEW_LINE = "Yo\nWhat's up\n\n"
 DIFFERENT_LANGUAGE_CHARACTERS = "త్వరిత గోధుమ నక్క సోమరి కుక్కపైకి దూకుతుంది"
 RECEIVER_ALIAS = 'testing_reciever'
 MEMBER_LIST = [SENDER_ALIAS, RECEIVER_ALIAS]
-PRIVATE_PROPS = message_props_private = MessageProperties(PRIVATE_ROOM_NAME, RECEIVER_ALIAS, SENDER_ALIAS, MESS_TYPE_SENT)
-PUBLIC_PROPS = message_props_public = MessageProperties(PUBLIC_ROOM_NAME, RECEIVER_ALIAS, SENDER_ALIAS, MESS_TYPE_SENT)
+PRIVATE_PROPS = MessageProperties(PRIVATE_ROOM_NAME, RECEIVER_ALIAS, SENDER_ALIAS, MESS_TYPE_SENT)
+PUBLIC_PROPS = MessageProperties(PUBLIC_ROOM_NAME, RECEIVER_ALIAS, SENDER_ALIAS, MESS_TYPE_SENT)
 
 
 class RoomTest(TestCase):
@@ -36,26 +36,26 @@ class RoomTest(TestCase):
         and a string with non-english characters
         """
 
-        sent = self.test_public_room.send_message(public_message, SENDER_ALIAS, message_props_public)
+        sent = self.test_public_room.send_message(public_message, SENDER_ALIAS, PUBLIC_PROPS)
         self.assertTrue(sent)
-        sent = self.test_public_room.send_message(EMPTY_STRING, SENDER_ALIAS, message_props_public)
+        sent = self.test_public_room.send_message(EMPTY_STRING, SENDER_ALIAS, PUBLIC_PROPS)
         self.assertTrue(sent)
-        sent = self.test_public_room.send_message(NUM_STRING, SENDER_ALIAS, message_props_public)
+        sent = self.test_public_room.send_message(NUM_STRING, SENDER_ALIAS, PUBLIC_PROPS)
         self.assertTrue(sent)
-        sent = self.test_public_room.send_message(NEW_LINE, SENDER_ALIAS, message_props_public)
+        sent = self.test_public_room.send_message(NEW_LINE, SENDER_ALIAS, PUBLIC_PROPS)
         self.assertTrue(sent)
-        sent = self.test_public_room.send_message(DIFFERENT_LANGUAGE_CHARACTERS, SENDER_ALIAS, message_props_public)
+        sent = self.test_public_room.send_message(DIFFERENT_LANGUAGE_CHARACTERS, SENDER_ALIAS, PUBLIC_PROPS)
         self.assertTrue(sent)
         
-        sent = self.test_private_room.send_message(private_message, SENDER_ALIAS, message_props_private)
+        sent = self.test_private_room.send_message(private_message, SENDER_ALIAS, PRIVATE_PROPS)
         self.assertTrue(sent)
-        sent = self.test_private_room.send_message(EMPTY_STRING, SENDER_ALIAS, message_props_public)
+        sent = self.test_private_room.send_message(EMPTY_STRING, SENDER_ALIAS, PRIVATE_PROPS)
         self.assertTrue(sent)
-        sent = self.test_private_room.send_message(NUM_STRING, SENDER_ALIAS, message_props_public)
+        sent = self.test_private_room.send_message(NUM_STRING, SENDER_ALIAS, PRIVATE_PROPS)
         self.assertTrue(sent)
-        sent = self.test_private_room.send_message(NEW_LINE, SENDER_ALIAS, message_props_public)
+        sent = self.test_private_room.send_message(NEW_LINE, SENDER_ALIAS, PRIVATE_PROPS)
         self.assertTrue(sent)
-        sent = self.test_private_room.send_message(DIFFERENT_LANGUAGE_CHARACTERS, SENDER_ALIAS, message_props_public)
+        sent = self.test_private_room.send_message(DIFFERENT_LANGUAGE_CHARACTERS, SENDER_ALIAS, PRIVATE_PROPS)
         self.assertTrue(sent)
         return sent
         
@@ -109,13 +109,18 @@ class RoomTest(TestCase):
         self.assertIn(DIFFERENT_LANGUAGE_CHARACTERS, message_bodies)
         self.assertIn(NEW_LINE, message_bodies)
 
-        self.test_private_room.send_message(DEFAULT_PUBLIC_TEST_MESS, SENDER_ALIAS, PUBLIC_PROPS)
-        self.test_private_room.send_message(EMPTY_STRING, SENDER_ALIAS, PUBLIC_PROPS)
-        self.test_private_room.send_message(NUM_STRING, SENDER_ALIAS, PUBLIC_PROPS)
-        self.test_private_room.send_message(DIFFERENT_LANGUAGE_CHARACTERS, SENDER_ALIAS, PUBLIC_PROPS)
-        self.test_private_room.send_message(NEW_LINE, SENDER_ALIAS, PUBLIC_PROPS)
-        message_objs, message_bodies, num_messages = self.test_public_room.get_messages(RECEIVER_ALIAS, 10)
-        self.assertIn(DEFAULT_PUBLIC_TEST_MESS, message_bodies)
+        sent = self.test_private_room.send_message(DEFAULT_PRIVATE_TEST_MESS, SENDER_ALIAS, PRIVATE_PROPS)
+        self.assertTrue(sent)
+        sent = self.test_private_room.send_message(EMPTY_STRING, SENDER_ALIAS, PRIVATE_PROPS)
+        self.assertTrue(sent)
+        sent = self.test_private_room.send_message(NUM_STRING, SENDER_ALIAS, PRIVATE_PROPS)
+        self.assertTrue(sent)
+        sent =self.test_private_room.send_message(DIFFERENT_LANGUAGE_CHARACTERS, SENDER_ALIAS, PRIVATE_PROPS)
+        self.assertTrue(sent)
+        sent = self.test_private_room.send_message(NEW_LINE, SENDER_ALIAS, PRIVATE_PROPS)
+        self.assertTrue(sent)
+        message_objs, message_bodies, num_messages = self.test_private_room.get_messages(RECEIVER_ALIAS, 10)
+        self.assertIn(DEFAULT_PRIVATE_TEST_MESS, message_bodies)
         self.assertIn(EMPTY_STRING, message_bodies)
         self.assertIn(NUM_STRING, message_bodies)
         self.assertIn(DIFFERENT_LANGUAGE_CHARACTERS, message_bodies)
