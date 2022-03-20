@@ -251,37 +251,65 @@ class RoomList():
     def __init__(self, name: str = DEFAULT_ROOM_LIST_NAME) -> None:
         """ Try to restore from mongo 
         """
-        pass
+        self.__name = name
+        self.__mongo_client = MongoClient(host='34.94.157.136', port=27017, username='class', password='CPSC313', authSource='detest', authMechanism='SCRAM-SHA-256')
+        self.__mongo_db = self.__mongo_client.detest
+        self.__room_list = {}
+        self.__mongo_collection = self.__mongo_db["roomlist"]
+        if not self.__restore():
+            self.__create_time = datetime.now()
 
     def create(self, room_name: str, owner_alias: str, member_list: list = None, room_type: int = ROOM_TYPE_PRIVATE) -> ChatRoom:
-        pass
+        new_chatroom = ChatRoom(room_name=room_name, owner_alias=owner_alias, member_list=member_list, room_type=room_type, create_new=True)
+        self.add(new_chatroom)
 
-    def add(self, new_room: ChatRoom):
-        pass
+    def add(self, new_room: ChatRoom, new_room_name):
+        self.__room_list[new_room_name] = new_room
+        self.__persist()
 
     def find_room_in_metadata(self, room_name: str) -> dict:
-        pass
+        return self.__room_list[room_name].to_dict()
 
     def get_rooms(self):
-        pass
+        return self.__room_list.values()
 
     def get(self, room_name: str) -> ChatRoom:
-        pass
-
-    def __find_pos(self, room_name: str) -> int:
-        pass
+        return self.__room_list[room_name]
     
     def find_by_member(self, member_alias: str) -> list:
+        # TODO after member list works in jsons
+        #for chatroom in self.__room_list.keys():
+        #    metadata = self.find_room_in_metadata(chatroom)
         pass
 
     def find_by_owner(self, owner_alias: str) -> list:
-        pass
+        return_list = []
+        for chatroom in self.__room_list.keys():
+            metadata = self.find_room_in_metadata(chatroom)
+            if metadata['owner_alias'] == owner_alias:
+                return_list.append(chatroom)
+        return return_list
+
 
     def remove(self, room_name: str):
-        pass
+        del self.__room_list[room_name]
+        self.__persist()
 
     def __persist(self):
-        pass
+        metadata = {
+            'list_name': self.__name,
+            'room_names': self.__room_list.keys,
+            'create_time': self.__create_time,
+            'modify_time': datetime.now()
+        }
+        self.__mongo_collection.insert_one(metadata)
+
 
     def __restore(self) -> bool:
-        pass
+        room_metadata = self.__mongo_collection.find_one( { 'list_name': self.__name})
+        if room_metadata:
+            restore_room_names = room_metadata['room_names']
+            for room_name in restore_room_names:
+                self.__room_list[room_name] = ChatRoom(room_name=room_name)
+            return True
+        return False
