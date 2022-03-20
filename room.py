@@ -126,7 +126,7 @@ class ChatRoom(deque):
             self.__dirty = False
         else:
             self.__create_time = datetime.now()
-            self.__modify_time = datetime.now()
+            self.__last_modified_time = datetime.now()
             self.__dirty = True
         # Restore from mongo if possible, if not (or we're creating new) then setup properties
 

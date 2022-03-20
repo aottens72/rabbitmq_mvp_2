@@ -74,8 +74,24 @@ class RoomTest(TestCase):
         self.assertGreater(num_messages, 0)
 
         self.test_send()
+        message_objects, message_bodies, num_messages = self.test_public_room.get_messages(RECEIVER_ALIAS, NUM_MESSAGES_TO_GET)
+        self.assertLessEqual(num_messages, NUM_MESSAGES_TO_GET)
 
-        pass
+        self.test_send()
+        message_objects, message_bodies, num_messages = self.test_private_room.get_messages(RECEIVER_ALIAS)
+        self.assertEqual(len(message_objects), len(message_bodies))
+        self.assertEqual(num_messages, len(message_bodies))
+        self.assertGreater(num_messages, 0)
+
+        self.test_send()
+        message_bodies, num_messages = self.test_private_room.get_messages(RECEIVER_ALIAS, return_objects=False)
+        self.assertEqual(num_messages, len(message_bodies))
+        self.assertGreater(num_messages, 0)
+
+        self.test_send()
+        message_objects, message_bodies, num_messages = self.test_private_room.get_messages(RECEIVER_ALIAS, NUM_MESSAGES_TO_GET)
+        self.assertLessEqual(num_messages, NUM_MESSAGES_TO_GET)
+        return message_bodies
 
     def test_full(self):
         """ Doing both and make sure that what we sent is in what we get back
