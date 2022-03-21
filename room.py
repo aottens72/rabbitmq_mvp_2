@@ -106,7 +106,7 @@ class ChatRoom(deque):
         self.__mongo_db = self.__mongo_client.detest
         self.__mongo_collection = self.__mongo_db.get_collection(room_name) 
         self.__mongo_seq_collection = self.__mongo_db.get_collection("sequence")
-        if self.__mongo_collection is None:
+        if self.__mongo_collection is None and create_new:
             self.__mongo_collection = self.__mongo_db.create_collection(room_name)
 
         self.__rmq_creds = pika.PlainCredentials(RMQ_USER, RMQ_PASS)
