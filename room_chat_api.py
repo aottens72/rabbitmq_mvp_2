@@ -84,17 +84,16 @@ async def register_client(client_alias: str, group_alias: bool = False):
 async def create_room(room_name: str, owner_alias: str, room_type: int = ROOM_TYPE_PRIVATE):
     """ API for creating a room
     """
-    pass
-
-@app.post("/message/", status_code=201)
+    room_to_create = ChatRoom(room_name, owner_alias=owner_alias, room_type=ROOM_TYPE_PUBLIC, create_new=False)
+    room_to_create.put('')
+    return room_to_create
+ 
+@app.post("/message", status_code=201)
 async def send_message(room_name: str, message: str, from_alias: str, to_alias: str):
     """ API for sending a message
     """
     room_to_send = ChatRoom(room_name, owner_alias=to_alias, room_type=ROOM_TYPE_PUBLIC, create_new=False)
-    message_props = MessageProperties(room_name, to_alias, from_alias, ROOM_TYPE_PUBLIC)
-    sent = room_to_send.send_message(message, from_alias, message_props)
-
-    return sent
+    return room_to_send.send_message(message, from_alias, MessageProperties(room_name, to_alias, from_alias, ROOM_TYPE_PUBLIC))
 
 def main():
     logging.basicConfig(filename='chat.log', level=logging.INFO)
