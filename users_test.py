@@ -4,7 +4,7 @@ from constants import *
 from users import *
 
 class UserTest(TestCase):
-    """ Docstring
+    """ Class for testing user functionality
     """
     def setUp(self) -> None:
 #        super().__init__(methodName)
@@ -15,6 +15,8 @@ class UserTest(TestCase):
         return self.__cur_users
 
     def test_adding(self):
+        """ Test for register function that adds users
+        """
         user1 = self.__cur_users.register(NAME1)
         self.assertEqual(user1.to_dict()['alias'], NAME1)
         
@@ -25,6 +27,8 @@ class UserTest(TestCase):
         self.assertEqual(user3.to_dict()['alias'], NAME3)
 
     def test_getting(self):
+        """ Test to get the users added in previous test
+        """
         self.test_adding()
         user1 = self.__cur_users.get(NAME1)
         self.assertEqual(user1.to_dict()['alias'], NAME1)
