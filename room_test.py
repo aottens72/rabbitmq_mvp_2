@@ -1,3 +1,11 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 from datetime import datetime
 from sre_constants import ASSERT
 from unittest import TestCase
@@ -22,7 +30,7 @@ PUBLIC_PROPS = MessageProperties(PUBLIC_ROOM_NAME, RECEIVER_ALIAS, SENDER_ALIAS,
 
 
 class RoomTest(TestCase):
-    """ Docstring
+    """ Tests just the sending functionality
     """
     def setUp(self) -> None:
         self.test_public_room = ChatRoom(PUBLIC_ROOM_NAME, owner_alias=RECEIVER_ALIAS, 
@@ -95,7 +103,7 @@ class RoomTest(TestCase):
         return message_bodies
 
     def test_full(self):
-        """ Doing both and make sure that what we sent is in what we get back
+        """ Doing both and make sure that what we sent is within what we get back
         """
         self.test_public_room.send_message(DEFAULT_PUBLIC_TEST_MESS, SENDER_ALIAS, PUBLIC_PROPS)
         self.test_public_room.send_message(EMPTY_STRING, SENDER_ALIAS, PUBLIC_PROPS)

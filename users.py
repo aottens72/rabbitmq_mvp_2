@@ -1,3 +1,11 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 import queue
 from datetime import date, datetime
 from pymongo import MongoClient
@@ -39,15 +47,19 @@ class UserList():
         if not self.__restore():
             self.__create_time = datetime.now()
     
+    
     def to_dict(self):
+        """
+            to_dict saves UserList metadata into a dictionary. This is used for storing UserList in Mongo
+        """
         return {'list_name': self.__name, 'user_list': self.__user_list, 'create_time': self.__create_time, 'modify_time': self.__modify_time}
 
     def register(self, new_alias: str) -> ChatUser:
         """
+            register creates a new user and appends it to the list, the append function
         """
         new_user = ChatUser(alias=new_alias)
-        self.__user_list[new_alias] = new_user
-        self.__persist()
+        self.append(new_user)
         return new_user
 
     def get(self, target_alias: str) -> ChatUser:
@@ -59,6 +71,7 @@ class UserList():
     def append(self, new_user: ChatUser) -> None:
         new_alias = new_user.to_dict()['alias']
         self.__user_list[new_alias] = new_user
+        self.__persist()
 
     def __restore(self) -> bool:
         """ First get the document for the queue itself, then get all documents that are not the queue metadata
@@ -66,6 +79,8 @@ class UserList():
         user_list_metadata = self.__mongo_collection.find_one( { 'list_name': self.__name})
         if user_list_metadata:
             restore_user_names = user_list_metadata['user_names']
+            self.__name = user_list_metadata['list_name']
+            self.__create_time = user_list_metadata['create_time']
             for user_name in restore_user_names:
                 user_data = self.__mongo_collection.find_one({ 'alias': user_name})
                 self.__user_list[user_name] = ChatUser(alias=user_data['alias'], create_time=user_data['create_time'], modify_time=user_data['modify_time'])
@@ -78,7 +93,7 @@ class UserList():
         """
         metadata = {
             'list_name': self.__name,
-            'user_names': self.__user_list.keys,
+            'user_names': list(self.__user_list.keys()),
             'create_time': self.__create_time,
             'modify_time': datetime.now()
         }

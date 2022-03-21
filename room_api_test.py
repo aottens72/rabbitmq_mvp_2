@@ -1,35 +1,44 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 import json
 import requests
+import logging
 import unittest
+from fastapi.testclient import TestClient
 from users import *
 from constants import *
+import room_chat_api
 
 MESSAGES = ["first"]
 NUM_MESSAGES = 4
 
 class ChatTest(unittest.TestCase):
 
+    def setUp(self) -> None:
+        logging.basicConfig(filename='api_tests.log', encoding='utf-8', level=logging.DEBUG)
+        self.client = TestClient(room_chat_api.app)
+
     def test_send(self):
         """ Testing the send api
         """
-        pass
+        logging.info(f"Inside test_send... Posting request... Current Message: {TEST_MESSAGE_1}")
+        response = self.client.post(f'/message?room_name=general&message={TEST_MESSAGE_1}&from_alias={NAME1}&to_alias={NAME2}')
+        response_json = response.json()
+        self.assertEqual(response.status_code, 200)
 
-    def test_get(self):
-        """ Testing the get messages api
-        """
-        pass
+        logging.info(f"Inside test_send... Posting request... Current Message: {TEST_MESSAGE_2}")
+        response = self.client.post(f'/message?room_name=general&message={TEST_MESSAGE_2}&from_alias={NAME1}&to_alias={NAME2}')
+        response_json = response.json()
+        self.assertEqual(response.status_code, 200)
 
-    def test_register(self):
-        """ Testing the user and room registration apis
-        """
-        pass
-
-    def test_get_users(self):
-        """ Testing the get users api
-        """
-        pass
-
-            
-
-        
+        logging.info(f"Inside test_send... Posting request... Current Message: {TEST_MESSAGE_2}")
+        response = self.client.post(f'/message?room_name=general&message={TEST_MESSAGE_2}&from_alias={NAME1}&to_alias={NAME2}')
+        response_json = response.json()
+        self.assertEqual(response.status_code, 200)
 
