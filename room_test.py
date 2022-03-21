@@ -1,3 +1,11 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 from datetime import datetime
 from sre_constants import ASSERT
 from unittest import TestCase

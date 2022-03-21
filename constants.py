@@ -1,3 +1,11 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 ROOM_TYPE_PRIVATE = 200
 ROOM_TYPE_PUBLIC = 100
 GET_ALL_MESSAGES = -1

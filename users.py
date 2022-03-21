@@ -1,3 +1,11 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 import queue
 from datetime import date, datetime
 from pymongo import MongoClient

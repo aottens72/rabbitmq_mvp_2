@@ -1,3 +1,11 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 import unittest
 from unittest import TestCase
 from constants import *

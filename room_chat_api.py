@@ -1,3 +1,11 @@
+"""
+Jacob Ottens
+Alex Hollier
+Ethan Ching
+Evan Henderson
+
+Lab 4 -- Rabbit MVP 2
+"""
 from asyncio.windows_events import NULL
 import socket
 import logging
@@ -61,7 +69,7 @@ async def get_messages(request: Request, alias: str, room_name: str, messages_to
     room_to_get = ChatRoom(room_name, owner_alias=alias, room_type=ROOM_TYPE_PUBLIC)
     room_messages = room_to_get.get_messages(alias)
 
-    return room_messages[0]
+    return room_messages[1]
 
 @app.get("/users/", status_code=200)
 async def get_users():
