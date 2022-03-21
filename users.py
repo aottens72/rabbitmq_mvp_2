@@ -39,11 +39,16 @@ class UserList():
         if not self.__restore():
             self.__create_time = datetime.now()
     
+    
     def to_dict(self):
+        """
+            to_dict saves UserList metadata into a dictionary. This is used for storing UserList in Mongo
+        """
         return {'list_name': self.__name, 'user_list': self.__user_list, 'create_time': self.__create_time, 'modify_time': self.__modify_time}
 
     def register(self, new_alias: str) -> ChatUser:
         """
+            register creates a new user and appends it to the list, the append function
         """
         new_user = ChatUser(alias=new_alias)
         self.append(new_user)
