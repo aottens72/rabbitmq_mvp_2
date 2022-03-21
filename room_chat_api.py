@@ -67,12 +67,12 @@ async def get_messages(request: Request, alias: str, room_name: str, messages_to
 async def get_users():
     """ API for getting users
     """
-    users = getUserList()
+    try:
+        users = UserList()
+    except:
+        users = UserList('test_users')
 
-    if len(users.get_all_users()) > 0:
-        return users.get_all_users()
-    else:
-        return JSONResponse(status_code=405, content="No users have been registered")
+    return users.get_all_users()
 
 @app.post("/alias", status_code=201)
 async def register_client(client_alias: str, group_alias: bool = False):
@@ -99,9 +99,3 @@ def main():
     logging.basicConfig(filename='chat.log', level=logging.INFO)
     MY_IPADDRESS = socket.gethostbyname(socket.gethostname())
     MY_NAME = input("Please enter your name: ")
-
-def getUserList():
-    try:
-        return UserList()
-    except:
-        return UserList('chat_users')
