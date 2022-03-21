@@ -135,8 +135,6 @@ class ChatRoom(deque):
             'room_name': self.__room_name,
             'room_type': self.__room_type,
             'owner_alias': self.__owner_alias,
-            #TODO: Figure out how the fuck to add member list
-            #'memeber_list': self.__user_list.get_all_users(),
             'create_time': self.__create_time,
             'modify_time': self.__last_modified_time
         }
